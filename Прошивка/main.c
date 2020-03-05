@@ -5,6 +5,11 @@
 #define SPI_sck PORTB5
 #define SPI_miso PORTB4
 #define SPI_mosi PORTB3
+#define avaliable_spi 0
+#define avaliable_usart 1
+#define transmit_spi 2
+#define transmit_usart 3
+#define connect 4
 #define F_CPU 16000000UL
 
 #include <avr/io.h>
@@ -14,7 +19,8 @@ volatile uint8_t data_mcp[2] = {0, 0};
 volatile uint8_t data_max[4] = {0, 0, 0, 0};
 volatile uint8_t data_recive[3] = {0, 0, 0};
 volatile uint8_t data_transmit[3] = {0, 0, 0};
-volatile uint8_t avaliable_spi = 0, avaliable_usart = 0, transmit_usart = 0, transmit_spi = 0, step_transmit = 0, counter_recive = 0, counter_usart = 0, connect = 0;
+volatile uint8_t flags_avaliable = 0;
+volatile uint8_t step_transmit = 0, counter_recive = 0, counter_usart = 0;
 volatile uint16_t counter_update_max = 0, usart_recive_data = 0;
 volatile uint8_t mode = 0; // режим работы
 
@@ -47,17 +53,17 @@ void initialization()
 
 void spi_transmit_mcp(uint8_t command, uint8_t data)//отправка по spi на mcp41010
 {
-	avaliable_spi = 1; //флаг занятости шины spi
+	flags_avaliable |= (1 << avaliable_spi);//флаг занятости шины spi
 	data_mcp[0] = command;
 	data_mcp[1] = data;
 	PORTC &= ~(1 << CS_mcp41010); //прижимаем CS к земле
-	transmit_spi = 1; // сообщаем, что занимаемся отправкой
+	flags_avaliable |= (1 << transmit_spi); // сообщаем, что занимаемся отправкой
 	SPDR = data_mcp[0]; // отправляем 1 пакет данных
 }
 
 void spi_reception_max31855()
 {
-	avaliable_spi = 1;
+	flags_avaliable |= (1 << avaliable_spi);
 	PORTC &= ~(1 << CS_max31855);
 	SPDR = 0xFF;
 }
@@ -68,8 +74,8 @@ void USART_Transmit(uint8_t command, uint16_t data) // передача команды и данных
 	data_transmit[0] = command;
 	data_transmit[1] = data >> 8;
 	data_transmit[2] = data & 0xFF;
-	avaliable_usart = 1; // говорим что занят uart
-	transmit_usart = 1;
+	flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
+	flags_avaliable |= (1 << transmit_usart);
 	counter_usart = 0;
 	UDR0 = data_transmit[0]; //записываем данные
 }
@@ -82,7 +88,7 @@ volatile uint16_t temperature_avaliable()
 
 ISR(SPI_STC_vect)
 {
-	if (transmit_spi == 1) //проверяем отправляем ли мы данные
+	if (flags_avaliable & (1 << transmit_spi)) //проверяем отправляем ли мы данные
 	{
 		switch(step_transmit)
 		{
@@ -93,8 +99,8 @@ ISR(SPI_STC_vect)
 			case 1: //завершаем отправку
 				PORTC |= (1 << CS_mcp41010); // отжимаем CS от земли
 				step_transmit = 0;
-				avaliable_spi = 0; // SPI свободен
-				transmit_spi = 0; // больше отправлять не будем
+				flags_avaliable &= ~(1 << avaliable_spi); // SPI свободен
+				flags_avaliable &= ~(1 << transmit_spi); // больше отправлять не будем
 				break;
 		}	
 	}
@@ -104,7 +110,7 @@ ISR(SPI_STC_vect)
 		step_transmit++;
 		if (step_transmit > 3)
 		{
-			avaliable_spi = 0;
+			flags_avaliable &= (1 << avaliable_spi);
 			PORTC |= (1 << CS_max31855);
 			step_transmit = 0;
 			if ((data_max[1] & 0b00000001) == 0b00000001)
@@ -125,7 +131,7 @@ ISR(TIMER0_OVF_vect)
 	counter_update_max++;
 	if (counter_update_max == 10)
 	{
-		if (avaliable_spi == 0)
+		if (!(flags_avaliable & (1 << transmit_spi)))
 		{
 			counter_update_max = 0;
 			spi_reception_max31855();
@@ -135,15 +141,16 @@ ISR(TIMER0_OVF_vect)
 
 ISR(USART_TX_vect)
 {
-	if (transmit_usart == 1)
+	
+	if (flags_avaliable & (1 << transmit_usart))
 	{
 			UDR0 = data_transmit[counter_usart + 1];// посылаем следующий пакет
 			counter_usart++;
 			if (counter_usart > 2)//последняя посылка
 			{
 				counter_usart = 0;
-				avaliable_usart = 0;
-				transmit_usart = 0;
+				flags_avaliable &= ~(1 << avaliable_usart);
+				flags_avaliable &= ~(1 << transmit_usart);
 			}
 	}
 }
@@ -161,7 +168,7 @@ ISR(USART_RX_vect)
 				mode = data_recive[2];
 				break;
 			case 2:
-				USART_Transmit(13, temperature_avaliable());
+				USART_Transmit(0xD, temperature_avaliable());
 				break;
 			case 3:
 				break;
@@ -172,7 +179,7 @@ ISR(USART_RX_vect)
 			case 6:
 				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
 				{
-					connect = 1;
+					flags_avaliable |= (1 << connect);
 					USART_Transmit(0x10,0x3C33);
 				}
 				break;
@@ -195,11 +202,12 @@ int main(void)
 				{
 					spi_transmit_mcp(0b00010001,0);
 				}
+				while (mode == 0) {}
 				break;
 			case 1: //режим подготовки к измерению
 				if ((avaliable_usart == 0) && (connect == 1))
 				{
-					USART_Transmit(13, temperature_avaliable());
+					USART_Transmit(0xD, temperature_avaliable());
 				}
 				break;
 			case 2: //режим измерения

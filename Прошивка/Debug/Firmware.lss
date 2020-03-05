@@ -3,31 +3,31 @@ Firmware.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  00000474  2**0
+  0 .data         00000000  00800100  00800100  0000048e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000400  00000000  00000000  00000074  2**1
+  1 .text         0000041a  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000017  00800100  00800100  00000474  2**0
+  2 .bss          00000013  00800100  00800100  0000048e  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000474  2**0
+  3 .comment      00000030  00000000  00000000  0000048e  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004a4  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004c0  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000068  00000000  00000000  000004e4  2**0
+  5 .debug_aranges 00000068  00000000  00000000  00000500  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000009ca  00000000  00000000  0000054c  2**0
+  6 .debug_info   00000966  00000000  00000000  00000568  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 000006fc  00000000  00000000  00000f16  2**0
+  7 .debug_abbrev 000006fc  00000000  00000000  00000ece  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000004b7  00000000  00000000  00001612  2**0
+  8 .debug_line   000004a4  00000000  00000000  000015ca  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000001a8  00000000  00000000  00001acc  2**2
+  9 .debug_frame  000001a8  00000000  00000000  00001a70  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000004d6  00000000  00000000  00001c74  2**0
+ 10 .debug_str    000004a4  00000000  00000000  00001c18  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000031b  00000000  00000000  0000214a  2**0
+ 11 .debug_loc    0000031b  00000000  00000000  000020bc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000058  00000000  00000000  00002465  2**0
+ 12 .debug_ranges 00000058  00000000  00000000  000023d7  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -49,11 +49,11 @@ Disassembly of section .text:
   34:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   38:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   3c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
-  40:	0c 94 15 01 	jmp	0x22a	; 0x22a <__vector_16>
-  44:	0c 94 b5 00 	jmp	0x16a	; 0x16a <__vector_17>
-  48:	0c 94 7b 01 	jmp	0x2f6	; 0x2f6 <__vector_18>
+  40:	0c 94 2a 01 	jmp	0x254	; 0x254 <__vector_16>
+  44:	0c 94 c1 00 	jmp	0x182	; 0x182 <__vector_17>
+  48:	0c 94 96 01 	jmp	0x32c	; 0x32c <__vector_18>
   4c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
-  50:	0c 94 50 01 	jmp	0x2a0	; 0x2a0 <__vector_20>
+  50:	0c 94 65 01 	jmp	0x2ca	; 0x2ca <__vector_20>
   54:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   58:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   5c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
@@ -78,11 +78,11 @@ Disassembly of section .text:
   7c:	1d 92       	st	X+, r1
 
 0000007e <.do_clear_bss_start>:
-  7e:	a7 31       	cpi	r26, 0x17	; 23
+  7e:	a3 31       	cpi	r26, 0x13	; 19
   80:	b2 07       	cpc	r27, r18
   82:	e1 f7       	brne	.-8      	; 0x7c <.do_clear_bss_loop>
-  84:	0e 94 d4 01 	call	0x3a8	; 0x3a8 <main>
-  88:	0c 94 fe 01 	jmp	0x3fc	; 0x3fc <_exit>
+  84:	0e 94 f1 01 	call	0x3e2	; 0x3e2 <main>
+  88:	0c 94 0b 02 	jmp	0x416	; 0x416 <_exit>
 
 0000008c <__bad_interrupt>:
   8c:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -180,495 +180,498 @@ void initialization()
 
 void spi_transmit_mcp(uint8_t command, uint8_t data)//отправка по spi на mcp41010
 {
-	avaliable_spi = 1; //флаг занятости шины spi
- 10a:	91 e0       	ldi	r25, 0x01	; 1
- 10c:	90 93 0a 01 	sts	0x010A, r25	; 0x80010a <avaliable_spi>
+	flags_avaliable |= (1 << avaliable_spi);//флаг занятости шины spi
+ 10a:	90 91 06 01 	lds	r25, 0x0106	; 0x800106 <flags_avaliable>
+ 10e:	91 60       	ori	r25, 0x01	; 1
+ 110:	90 93 06 01 	sts	0x0106, r25	; 0x800106 <flags_avaliable>
 	data_mcp[0] = command;
- 110:	e5 e1       	ldi	r30, 0x15	; 21
- 112:	f1 e0       	ldi	r31, 0x01	; 1
- 114:	80 83       	st	Z, r24
+ 114:	e1 e1       	ldi	r30, 0x11	; 17
+ 116:	f1 e0       	ldi	r31, 0x01	; 1
+ 118:	80 83       	st	Z, r24
 	data_mcp[1] = data;
- 116:	61 83       	std	Z+1, r22	; 0x01
+ 11a:	61 83       	std	Z+1, r22	; 0x01
 	PORTC &= ~(1 << CS_mcp41010); //прижимаем CS к земле
- 118:	41 98       	cbi	0x08, 1	; 8
-	transmit_spi = 1; // сообщаем, что занимаемся отправкой
- 11a:	90 93 07 01 	sts	0x0107, r25	; 0x800107 <transmit_spi>
+ 11c:	41 98       	cbi	0x08, 1	; 8
+	flags_avaliable |= (1 << transmit_spi); // сообщаем, что занимаемся отправкой
+ 11e:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 122:	84 60       	ori	r24, 0x04	; 4
+ 124:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 	SPDR = data_mcp[0]; // отправляем 1 пакет данных
- 11e:	80 81       	ld	r24, Z
- 120:	8e bd       	out	0x2e, r24	; 46
- 122:	08 95       	ret
+ 128:	80 81       	ld	r24, Z
+ 12a:	8e bd       	out	0x2e, r24	; 46
+ 12c:	08 95       	ret
 
-00000124 <spi_reception_max31855>:
+0000012e <spi_reception_max31855>:
 }
 
 void spi_reception_max31855()
 {
-	avaliable_spi = 1;
- 124:	81 e0       	ldi	r24, 0x01	; 1
- 126:	80 93 0a 01 	sts	0x010A, r24	; 0x80010a <avaliable_spi>
+	flags_avaliable |= (1 << avaliable_spi);
+ 12e:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 132:	81 60       	ori	r24, 0x01	; 1
+ 134:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 	PORTC &= ~(1 << CS_max31855);
- 12a:	40 98       	cbi	0x08, 0	; 8
+ 138:	40 98       	cbi	0x08, 0	; 8
 	SPDR = 0xFF;
- 12c:	8f ef       	ldi	r24, 0xFF	; 255
- 12e:	8e bd       	out	0x2e, r24	; 46
- 130:	08 95       	ret
+ 13a:	8f ef       	ldi	r24, 0xFF	; 255
+ 13c:	8e bd       	out	0x2e, r24	; 46
+ 13e:	08 95       	ret
 
-00000132 <USART_Transmit>:
+00000140 <USART_Transmit>:
 }
 
 void USART_Transmit(uint8_t command, uint16_t data) // передача команды и данных по uart
 {
 	//делим на пакеты
 	data_transmit[0] = command;
- 132:	eb e0       	ldi	r30, 0x0B	; 11
- 134:	f1 e0       	ldi	r31, 0x01	; 1
- 136:	80 83       	st	Z, r24
+ 140:	e7 e0       	ldi	r30, 0x07	; 7
+ 142:	f1 e0       	ldi	r31, 0x01	; 1
+ 144:	80 83       	st	Z, r24
 	data_transmit[1] = data >> 8;
- 138:	71 83       	std	Z+1, r23	; 0x01
+ 146:	71 83       	std	Z+1, r23	; 0x01
 	data_transmit[2] = data & 0xFF;
- 13a:	62 83       	std	Z+2, r22	; 0x02
-	avaliable_usart = 1; // говорим что занят uart
- 13c:	81 e0       	ldi	r24, 0x01	; 1
- 13e:	80 93 09 01 	sts	0x0109, r24	; 0x800109 <avaliable_usart>
-	transmit_usart = 1;
- 142:	80 93 08 01 	sts	0x0108, r24	; 0x800108 <transmit_usart>
+ 148:	62 83       	std	Z+2, r22	; 0x02
+	flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
+ 14a:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 14e:	82 60       	ori	r24, 0x02	; 2
+ 150:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
+	flags_avaliable |= (1 << transmit_usart);
+ 154:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 158:	88 60       	ori	r24, 0x08	; 8
+ 15a:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 	counter_usart = 0;
- 146:	10 92 04 01 	sts	0x0104, r1	; 0x800104 <counter_usart>
+ 15e:	10 92 03 01 	sts	0x0103, r1	; 0x800103 <counter_usart>
 	UDR0 = data_transmit[0]; //записываем данные
- 14a:	80 81       	ld	r24, Z
- 14c:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
- 150:	08 95       	ret
+ 162:	80 81       	ld	r24, Z
+ 164:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 168:	08 95       	ret
 
-00000152 <temperature_avaliable>:
+0000016a <temperature_avaliable>:
 }
 
 volatile uint16_t temperature_avaliable()
 {
 	uint16_t temp = (data_max[0] << 4) | (data_max[1] >>4);
- 152:	e1 e1       	ldi	r30, 0x11	; 17
- 154:	f1 e0       	ldi	r31, 0x01	; 1
- 156:	80 81       	ld	r24, Z
- 158:	21 81       	ldd	r18, Z+1	; 0x01
+ 16a:	ed e0       	ldi	r30, 0x0D	; 13
+ 16c:	f1 e0       	ldi	r31, 0x01	; 1
+ 16e:	80 81       	ld	r24, Z
+ 170:	21 81       	ldd	r18, Z+1	; 0x01
 	return temp;
- 15a:	30 e1       	ldi	r19, 0x10	; 16
- 15c:	83 9f       	mul	r24, r19
- 15e:	c0 01       	movw	r24, r0
- 160:	11 24       	eor	r1, r1
- 162:	22 95       	swap	r18
- 164:	2f 70       	andi	r18, 0x0F	; 15
+ 172:	30 e1       	ldi	r19, 0x10	; 16
+ 174:	83 9f       	mul	r24, r19
+ 176:	c0 01       	movw	r24, r0
+ 178:	11 24       	eor	r1, r1
+ 17a:	22 95       	swap	r18
+ 17c:	2f 70       	andi	r18, 0x0F	; 15
 }
- 166:	82 2b       	or	r24, r18
- 168:	08 95       	ret
+ 17e:	82 2b       	or	r24, r18
+ 180:	08 95       	ret
 
-0000016a <__vector_17>:
+00000182 <__vector_17>:
 
 ISR(SPI_STC_vect)
 {
- 16a:	1f 92       	push	r1
- 16c:	0f 92       	push	r0
- 16e:	0f b6       	in	r0, 0x3f	; 63
- 170:	0f 92       	push	r0
- 172:	11 24       	eor	r1, r1
- 174:	2f 93       	push	r18
- 176:	3f 93       	push	r19
- 178:	4f 93       	push	r20
- 17a:	5f 93       	push	r21
- 17c:	6f 93       	push	r22
- 17e:	7f 93       	push	r23
- 180:	8f 93       	push	r24
- 182:	9f 93       	push	r25
- 184:	af 93       	push	r26
- 186:	bf 93       	push	r27
- 188:	ef 93       	push	r30
- 18a:	ff 93       	push	r31
-	if (transmit_spi == 1) //проверяем отправляем ли мы данные
- 18c:	80 91 07 01 	lds	r24, 0x0107	; 0x800107 <transmit_spi>
- 190:	81 30       	cpi	r24, 0x01	; 1
- 192:	b1 f4       	brne	.+44     	; 0x1c0 <__vector_17+0x56>
+ 182:	1f 92       	push	r1
+ 184:	0f 92       	push	r0
+ 186:	0f b6       	in	r0, 0x3f	; 63
+ 188:	0f 92       	push	r0
+ 18a:	11 24       	eor	r1, r1
+ 18c:	2f 93       	push	r18
+ 18e:	3f 93       	push	r19
+ 190:	4f 93       	push	r20
+ 192:	5f 93       	push	r21
+ 194:	6f 93       	push	r22
+ 196:	7f 93       	push	r23
+ 198:	8f 93       	push	r24
+ 19a:	9f 93       	push	r25
+ 19c:	af 93       	push	r26
+ 19e:	bf 93       	push	r27
+ 1a0:	ef 93       	push	r30
+ 1a2:	ff 93       	push	r31
+	if (flags_avaliable & (1 << transmit_spi)) //проверяем отправляем ли мы данные
+ 1a4:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 1a8:	82 ff       	sbrs	r24, 2
+ 1aa:	1c c0       	rjmp	.+56     	; 0x1e4 <__vector_17+0x62>
 	{
 		switch(step_transmit)
- 194:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <step_transmit>
- 198:	88 23       	and	r24, r24
- 19a:	19 f0       	breq	.+6      	; 0x1a2 <__vector_17+0x38>
- 19c:	81 30       	cpi	r24, 0x01	; 1
- 19e:	41 f0       	breq	.+16     	; 0x1b0 <__vector_17+0x46>
- 1a0:	33 c0       	rjmp	.+102    	; 0x208 <__vector_17+0x9e>
+ 1ac:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <step_transmit>
+ 1b0:	88 23       	and	r24, r24
+ 1b2:	19 f0       	breq	.+6      	; 0x1ba <__vector_17+0x38>
+ 1b4:	81 30       	cpi	r24, 0x01	; 1
+ 1b6:	41 f0       	breq	.+16     	; 0x1c8 <__vector_17+0x46>
+ 1b8:	3c c0       	rjmp	.+120    	; 0x232 <__vector_17+0xb0>
 		{
 			case 0:
 				SPDR = data_mcp[1]; // отправляем 2 пакет данных
- 1a2:	80 91 16 01 	lds	r24, 0x0116	; 0x800116 <data_mcp+0x1>
- 1a6:	8e bd       	out	0x2e, r24	; 46
+ 1ba:	80 91 12 01 	lds	r24, 0x0112	; 0x800112 <data_mcp+0x1>
+ 1be:	8e bd       	out	0x2e, r24	; 46
 				step_transmit = 1; // следующий шаг в отправке
- 1a8:	81 e0       	ldi	r24, 0x01	; 1
- 1aa:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <step_transmit>
+ 1c0:	81 e0       	ldi	r24, 0x01	; 1
+ 1c2:	80 93 05 01 	sts	0x0105, r24	; 0x800105 <step_transmit>
 				break;
- 1ae:	2c c0       	rjmp	.+88     	; 0x208 <__vector_17+0x9e>
+ 1c6:	35 c0       	rjmp	.+106    	; 0x232 <__vector_17+0xb0>
 			case 1: //завершаем отправку
 				PORTC |= (1 << CS_mcp41010); // отжимаем CS от земли
- 1b0:	41 9a       	sbi	0x08, 1	; 8
+ 1c8:	41 9a       	sbi	0x08, 1	; 8
 				step_transmit = 0;
- 1b2:	10 92 06 01 	sts	0x0106, r1	; 0x800106 <step_transmit>
-				avaliable_spi = 0; // SPI свободен
- 1b6:	10 92 0a 01 	sts	0x010A, r1	; 0x80010a <avaliable_spi>
-				transmit_spi = 0; // больше отправлять не будем
- 1ba:	10 92 07 01 	sts	0x0107, r1	; 0x800107 <transmit_spi>
+ 1ca:	10 92 05 01 	sts	0x0105, r1	; 0x800105 <step_transmit>
+				flags_avaliable &= ~(1 << avaliable_spi); // SPI свободен
+ 1ce:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 1d2:	8e 7f       	andi	r24, 0xFE	; 254
+ 1d4:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
+				flags_avaliable &= ~(1 << transmit_spi); // больше отправлять не будем
+ 1d8:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 1dc:	8b 7f       	andi	r24, 0xFB	; 251
+ 1de:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 				break;
- 1be:	24 c0       	rjmp	.+72     	; 0x208 <__vector_17+0x9e>
+ 1e2:	27 c0       	rjmp	.+78     	; 0x232 <__vector_17+0xb0>
 		}	
 	}
 	else
 	{
 		data_max[step_transmit] = SPDR;
- 1c0:	e0 91 06 01 	lds	r30, 0x0106	; 0x800106 <step_transmit>
- 1c4:	f0 e0       	ldi	r31, 0x00	; 0
- 1c6:	8e b5       	in	r24, 0x2e	; 46
- 1c8:	ef 5e       	subi	r30, 0xEF	; 239
- 1ca:	fe 4f       	sbci	r31, 0xFE	; 254
- 1cc:	80 83       	st	Z, r24
+ 1e4:	e0 91 05 01 	lds	r30, 0x0105	; 0x800105 <step_transmit>
+ 1e8:	f0 e0       	ldi	r31, 0x00	; 0
+ 1ea:	8e b5       	in	r24, 0x2e	; 46
+ 1ec:	e3 5f       	subi	r30, 0xF3	; 243
+ 1ee:	fe 4f       	sbci	r31, 0xFE	; 254
+ 1f0:	80 83       	st	Z, r24
 		step_transmit++;
- 1ce:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <step_transmit>
- 1d2:	8f 5f       	subi	r24, 0xFF	; 255
- 1d4:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <step_transmit>
+ 1f2:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <step_transmit>
+ 1f6:	8f 5f       	subi	r24, 0xFF	; 255
+ 1f8:	80 93 05 01 	sts	0x0105, r24	; 0x800105 <step_transmit>
 		if (step_transmit > 3)
- 1d8:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <step_transmit>
- 1dc:	84 30       	cpi	r24, 0x04	; 4
- 1de:	90 f0       	brcs	.+36     	; 0x204 <__vector_17+0x9a>
+ 1fc:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <step_transmit>
+ 200:	84 30       	cpi	r24, 0x04	; 4
+ 202:	a8 f0       	brcs	.+42     	; 0x22e <__vector_17+0xac>
 		{
-			avaliable_spi = 0;
- 1e0:	10 92 0a 01 	sts	0x010A, r1	; 0x80010a <avaliable_spi>
+			flags_avaliable &= (1 << avaliable_spi);
+ 204:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 208:	81 70       	andi	r24, 0x01	; 1
+ 20a:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 			PORTC |= (1 << CS_max31855);
- 1e4:	40 9a       	sbi	0x08, 0	; 8
+ 20e:	40 9a       	sbi	0x08, 0	; 8
 			step_transmit = 0;
- 1e6:	10 92 06 01 	sts	0x0106, r1	; 0x800106 <step_transmit>
+ 210:	10 92 05 01 	sts	0x0105, r1	; 0x800105 <step_transmit>
 			if ((data_max[1] & 0b00000001) == 0b00000001)
- 1ea:	80 91 12 01 	lds	r24, 0x0112	; 0x800112 <data_max+0x1>
- 1ee:	80 ff       	sbrs	r24, 0
- 1f0:	0b c0       	rjmp	.+22     	; 0x208 <__vector_17+0x9e>
+ 214:	80 91 0e 01 	lds	r24, 0x010E	; 0x80010e <data_max+0x1>
+ 218:	80 ff       	sbrs	r24, 0
+ 21a:	0b c0       	rjmp	.+22     	; 0x232 <__vector_17+0xb0>
 			{
 				mode = 3;
- 1f2:	83 e0       	ldi	r24, 0x03	; 3
- 1f4:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
+ 21c:	83 e0       	ldi	r24, 0x03	; 3
+ 21e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
 				USART_Transmit(12,0);
- 1f8:	60 e0       	ldi	r22, 0x00	; 0
- 1fa:	70 e0       	ldi	r23, 0x00	; 0
- 1fc:	8c e0       	ldi	r24, 0x0C	; 12
- 1fe:	0e 94 99 00 	call	0x132	; 0x132 <USART_Transmit>
- 202:	02 c0       	rjmp	.+4      	; 0x208 <__vector_17+0x9e>
+ 222:	60 e0       	ldi	r22, 0x00	; 0
+ 224:	70 e0       	ldi	r23, 0x00	; 0
+ 226:	8c e0       	ldi	r24, 0x0C	; 12
+ 228:	0e 94 a0 00 	call	0x140	; 0x140 <USART_Transmit>
+ 22c:	02 c0       	rjmp	.+4      	; 0x232 <__vector_17+0xb0>
 			}
 		}
 		else
 		{
 			SPDR = 0xFF;
- 204:	8f ef       	ldi	r24, 0xFF	; 255
- 206:	8e bd       	out	0x2e, r24	; 46
+ 22e:	8f ef       	ldi	r24, 0xFF	; 255
+ 230:	8e bd       	out	0x2e, r24	; 46
 		}
 	}
 }
- 208:	ff 91       	pop	r31
- 20a:	ef 91       	pop	r30
- 20c:	bf 91       	pop	r27
- 20e:	af 91       	pop	r26
- 210:	9f 91       	pop	r25
- 212:	8f 91       	pop	r24
- 214:	7f 91       	pop	r23
- 216:	6f 91       	pop	r22
- 218:	5f 91       	pop	r21
- 21a:	4f 91       	pop	r20
- 21c:	3f 91       	pop	r19
- 21e:	2f 91       	pop	r18
- 220:	0f 90       	pop	r0
- 222:	0f be       	out	0x3f, r0	; 63
- 224:	0f 90       	pop	r0
- 226:	1f 90       	pop	r1
- 228:	18 95       	reti
+ 232:	ff 91       	pop	r31
+ 234:	ef 91       	pop	r30
+ 236:	bf 91       	pop	r27
+ 238:	af 91       	pop	r26
+ 23a:	9f 91       	pop	r25
+ 23c:	8f 91       	pop	r24
+ 23e:	7f 91       	pop	r23
+ 240:	6f 91       	pop	r22
+ 242:	5f 91       	pop	r21
+ 244:	4f 91       	pop	r20
+ 246:	3f 91       	pop	r19
+ 248:	2f 91       	pop	r18
+ 24a:	0f 90       	pop	r0
+ 24c:	0f be       	out	0x3f, r0	; 63
+ 24e:	0f 90       	pop	r0
+ 250:	1f 90       	pop	r1
+ 252:	18 95       	reti
 
-0000022a <__vector_16>:
+00000254 <__vector_16>:
 
 ISR(TIMER0_OVF_vect)
 {
- 22a:	1f 92       	push	r1
- 22c:	0f 92       	push	r0
- 22e:	0f b6       	in	r0, 0x3f	; 63
- 230:	0f 92       	push	r0
- 232:	11 24       	eor	r1, r1
- 234:	2f 93       	push	r18
- 236:	3f 93       	push	r19
- 238:	4f 93       	push	r20
- 23a:	5f 93       	push	r21
- 23c:	6f 93       	push	r22
- 23e:	7f 93       	push	r23
- 240:	8f 93       	push	r24
- 242:	9f 93       	push	r25
- 244:	af 93       	push	r26
- 246:	bf 93       	push	r27
- 248:	ef 93       	push	r30
- 24a:	ff 93       	push	r31
+ 254:	1f 92       	push	r1
+ 256:	0f 92       	push	r0
+ 258:	0f b6       	in	r0, 0x3f	; 63
+ 25a:	0f 92       	push	r0
+ 25c:	11 24       	eor	r1, r1
+ 25e:	2f 93       	push	r18
+ 260:	3f 93       	push	r19
+ 262:	4f 93       	push	r20
+ 264:	5f 93       	push	r21
+ 266:	6f 93       	push	r22
+ 268:	7f 93       	push	r23
+ 26a:	8f 93       	push	r24
+ 26c:	9f 93       	push	r25
+ 26e:	af 93       	push	r26
+ 270:	bf 93       	push	r27
+ 272:	ef 93       	push	r30
+ 274:	ff 93       	push	r31
 	counter_update_max++;
- 24c:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <counter_update_max>
- 250:	90 91 02 01 	lds	r25, 0x0102	; 0x800102 <counter_update_max+0x1>
- 254:	01 96       	adiw	r24, 0x01	; 1
- 256:	90 93 02 01 	sts	0x0102, r25	; 0x800102 <counter_update_max+0x1>
- 25a:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <counter_update_max>
+ 276:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <counter_update_max>
+ 27a:	90 91 02 01 	lds	r25, 0x0102	; 0x800102 <counter_update_max+0x1>
+ 27e:	01 96       	adiw	r24, 0x01	; 1
+ 280:	90 93 02 01 	sts	0x0102, r25	; 0x800102 <counter_update_max+0x1>
+ 284:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <counter_update_max>
 	if (counter_update_max == 10)
- 25e:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <counter_update_max>
- 262:	90 91 02 01 	lds	r25, 0x0102	; 0x800102 <counter_update_max+0x1>
- 266:	0a 97       	sbiw	r24, 0x0a	; 10
- 268:	51 f4       	brne	.+20     	; 0x27e <__vector_16+0x54>
+ 288:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <counter_update_max>
+ 28c:	90 91 02 01 	lds	r25, 0x0102	; 0x800102 <counter_update_max+0x1>
+ 290:	0a 97       	sbiw	r24, 0x0a	; 10
+ 292:	51 f4       	brne	.+20     	; 0x2a8 <__vector_16+0x54>
 	{
-		if (avaliable_spi == 0)
- 26a:	80 91 0a 01 	lds	r24, 0x010A	; 0x80010a <avaliable_spi>
- 26e:	81 11       	cpse	r24, r1
- 270:	06 c0       	rjmp	.+12     	; 0x27e <__vector_16+0x54>
+		if (!(flags_avaliable & (1 << transmit_spi)))
+ 294:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 298:	82 fd       	sbrc	r24, 2
+ 29a:	06 c0       	rjmp	.+12     	; 0x2a8 <__vector_16+0x54>
 		{
 			counter_update_max = 0;
- 272:	10 92 02 01 	sts	0x0102, r1	; 0x800102 <counter_update_max+0x1>
- 276:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <counter_update_max>
+ 29c:	10 92 02 01 	sts	0x0102, r1	; 0x800102 <counter_update_max+0x1>
+ 2a0:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <counter_update_max>
 			spi_reception_max31855();
- 27a:	0e 94 92 00 	call	0x124	; 0x124 <spi_reception_max31855>
+ 2a4:	0e 94 97 00 	call	0x12e	; 0x12e <spi_reception_max31855>
 		}
 	}
 }
- 27e:	ff 91       	pop	r31
- 280:	ef 91       	pop	r30
- 282:	bf 91       	pop	r27
- 284:	af 91       	pop	r26
- 286:	9f 91       	pop	r25
- 288:	8f 91       	pop	r24
- 28a:	7f 91       	pop	r23
- 28c:	6f 91       	pop	r22
- 28e:	5f 91       	pop	r21
- 290:	4f 91       	pop	r20
- 292:	3f 91       	pop	r19
- 294:	2f 91       	pop	r18
- 296:	0f 90       	pop	r0
- 298:	0f be       	out	0x3f, r0	; 63
- 29a:	0f 90       	pop	r0
- 29c:	1f 90       	pop	r1
- 29e:	18 95       	reti
+ 2a8:	ff 91       	pop	r31
+ 2aa:	ef 91       	pop	r30
+ 2ac:	bf 91       	pop	r27
+ 2ae:	af 91       	pop	r26
+ 2b0:	9f 91       	pop	r25
+ 2b2:	8f 91       	pop	r24
+ 2b4:	7f 91       	pop	r23
+ 2b6:	6f 91       	pop	r22
+ 2b8:	5f 91       	pop	r21
+ 2ba:	4f 91       	pop	r20
+ 2bc:	3f 91       	pop	r19
+ 2be:	2f 91       	pop	r18
+ 2c0:	0f 90       	pop	r0
+ 2c2:	0f be       	out	0x3f, r0	; 63
+ 2c4:	0f 90       	pop	r0
+ 2c6:	1f 90       	pop	r1
+ 2c8:	18 95       	reti
 
-000002a0 <__vector_20>:
+000002ca <__vector_20>:
 
 ISR(USART_TX_vect)
 {
- 2a0:	1f 92       	push	r1
- 2a2:	0f 92       	push	r0
- 2a4:	0f b6       	in	r0, 0x3f	; 63
- 2a6:	0f 92       	push	r0
- 2a8:	11 24       	eor	r1, r1
- 2aa:	8f 93       	push	r24
- 2ac:	ef 93       	push	r30
- 2ae:	ff 93       	push	r31
-	if (transmit_usart == 1)
- 2b0:	80 91 08 01 	lds	r24, 0x0108	; 0x800108 <transmit_usart>
- 2b4:	81 30       	cpi	r24, 0x01	; 1
- 2b6:	b9 f4       	brne	.+46     	; 0x2e6 <__vector_20+0x46>
+ 2ca:	1f 92       	push	r1
+ 2cc:	0f 92       	push	r0
+ 2ce:	0f b6       	in	r0, 0x3f	; 63
+ 2d0:	0f 92       	push	r0
+ 2d2:	11 24       	eor	r1, r1
+ 2d4:	8f 93       	push	r24
+ 2d6:	ef 93       	push	r30
+ 2d8:	ff 93       	push	r31
+	
+	if (flags_avaliable & (1 << transmit_usart))
+ 2da:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 2de:	83 ff       	sbrs	r24, 3
+ 2e0:	1d c0       	rjmp	.+58     	; 0x31c <__vector_20+0x52>
 	{
 			UDR0 = data_transmit[counter_usart + 1];// посылаем следующий пакет
- 2b8:	e0 91 04 01 	lds	r30, 0x0104	; 0x800104 <counter_usart>
- 2bc:	f0 e0       	ldi	r31, 0x00	; 0
- 2be:	e4 5f       	subi	r30, 0xF4	; 244
- 2c0:	fe 4f       	sbci	r31, 0xFE	; 254
- 2c2:	80 81       	ld	r24, Z
- 2c4:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 2e2:	e0 91 03 01 	lds	r30, 0x0103	; 0x800103 <counter_usart>
+ 2e6:	f0 e0       	ldi	r31, 0x00	; 0
+ 2e8:	e8 5f       	subi	r30, 0xF8	; 248
+ 2ea:	fe 4f       	sbci	r31, 0xFE	; 254
+ 2ec:	80 81       	ld	r24, Z
+ 2ee:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
 			counter_usart++;
- 2c8:	80 91 04 01 	lds	r24, 0x0104	; 0x800104 <counter_usart>
- 2cc:	8f 5f       	subi	r24, 0xFF	; 255
- 2ce:	80 93 04 01 	sts	0x0104, r24	; 0x800104 <counter_usart>
+ 2f2:	80 91 03 01 	lds	r24, 0x0103	; 0x800103 <counter_usart>
+ 2f6:	8f 5f       	subi	r24, 0xFF	; 255
+ 2f8:	80 93 03 01 	sts	0x0103, r24	; 0x800103 <counter_usart>
 			if (counter_usart > 2)//последняя посылка
- 2d2:	80 91 04 01 	lds	r24, 0x0104	; 0x800104 <counter_usart>
- 2d6:	83 30       	cpi	r24, 0x03	; 3
- 2d8:	30 f0       	brcs	.+12     	; 0x2e6 <__vector_20+0x46>
+ 2fc:	80 91 03 01 	lds	r24, 0x0103	; 0x800103 <counter_usart>
+ 300:	83 30       	cpi	r24, 0x03	; 3
+ 302:	60 f0       	brcs	.+24     	; 0x31c <__vector_20+0x52>
 			{
 				counter_usart = 0;
- 2da:	10 92 04 01 	sts	0x0104, r1	; 0x800104 <counter_usart>
-				avaliable_usart = 0;
- 2de:	10 92 09 01 	sts	0x0109, r1	; 0x800109 <avaliable_usart>
-				transmit_usart = 0;
- 2e2:	10 92 08 01 	sts	0x0108, r1	; 0x800108 <transmit_usart>
+ 304:	10 92 03 01 	sts	0x0103, r1	; 0x800103 <counter_usart>
+				flags_avaliable &= ~(1 << avaliable_usart);
+ 308:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 30c:	8d 7f       	andi	r24, 0xFD	; 253
+ 30e:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
+				flags_avaliable &= ~(1 << transmit_usart);
+ 312:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 316:	87 7f       	andi	r24, 0xF7	; 247
+ 318:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 			}
 	}
 }
- 2e6:	ff 91       	pop	r31
- 2e8:	ef 91       	pop	r30
- 2ea:	8f 91       	pop	r24
- 2ec:	0f 90       	pop	r0
- 2ee:	0f be       	out	0x3f, r0	; 63
- 2f0:	0f 90       	pop	r0
- 2f2:	1f 90       	pop	r1
- 2f4:	18 95       	reti
+ 31c:	ff 91       	pop	r31
+ 31e:	ef 91       	pop	r30
+ 320:	8f 91       	pop	r24
+ 322:	0f 90       	pop	r0
+ 324:	0f be       	out	0x3f, r0	; 63
+ 326:	0f 90       	pop	r0
+ 328:	1f 90       	pop	r1
+ 32a:	18 95       	reti
 
-000002f6 <__vector_18>:
+0000032c <__vector_18>:
 
 ISR(USART_RX_vect)
 {
- 2f6:	1f 92       	push	r1
- 2f8:	0f 92       	push	r0
- 2fa:	0f b6       	in	r0, 0x3f	; 63
- 2fc:	0f 92       	push	r0
- 2fe:	11 24       	eor	r1, r1
- 300:	2f 93       	push	r18
- 302:	3f 93       	push	r19
- 304:	4f 93       	push	r20
- 306:	5f 93       	push	r21
- 308:	6f 93       	push	r22
- 30a:	7f 93       	push	r23
- 30c:	8f 93       	push	r24
- 30e:	9f 93       	push	r25
- 310:	af 93       	push	r26
- 312:	bf 93       	push	r27
- 314:	ef 93       	push	r30
- 316:	ff 93       	push	r31
+ 32c:	1f 92       	push	r1
+ 32e:	0f 92       	push	r0
+ 330:	0f b6       	in	r0, 0x3f	; 63
+ 332:	0f 92       	push	r0
+ 334:	11 24       	eor	r1, r1
+ 336:	2f 93       	push	r18
+ 338:	3f 93       	push	r19
+ 33a:	4f 93       	push	r20
+ 33c:	5f 93       	push	r21
+ 33e:	6f 93       	push	r22
+ 340:	7f 93       	push	r23
+ 342:	8f 93       	push	r24
+ 344:	9f 93       	push	r25
+ 346:	af 93       	push	r26
+ 348:	bf 93       	push	r27
+ 34a:	ef 93       	push	r30
+ 34c:	ff 93       	push	r31
 	data_recive[counter_recive] = UDR0;
- 318:	e0 91 05 01 	lds	r30, 0x0105	; 0x800105 <counter_recive>
- 31c:	f0 e0       	ldi	r31, 0x00	; 0
- 31e:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
- 322:	e2 5f       	subi	r30, 0xF2	; 242
- 324:	fe 4f       	sbci	r31, 0xFE	; 254
- 326:	80 83       	st	Z, r24
+ 34e:	e0 91 04 01 	lds	r30, 0x0104	; 0x800104 <counter_recive>
+ 352:	f0 e0       	ldi	r31, 0x00	; 0
+ 354:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 358:	e6 5f       	subi	r30, 0xF6	; 246
+ 35a:	fe 4f       	sbci	r31, 0xFE	; 254
+ 35c:	80 83       	st	Z, r24
 	counter_recive ++;
- 328:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <counter_recive>
- 32c:	8f 5f       	subi	r24, 0xFF	; 255
- 32e:	80 93 05 01 	sts	0x0105, r24	; 0x800105 <counter_recive>
+ 35e:	80 91 04 01 	lds	r24, 0x0104	; 0x800104 <counter_recive>
+ 362:	8f 5f       	subi	r24, 0xFF	; 255
+ 364:	80 93 04 01 	sts	0x0104, r24	; 0x800104 <counter_recive>
 	if (counter_recive > 2) // если приняли все пакеты
- 332:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <counter_recive>
- 336:	83 30       	cpi	r24, 0x03	; 3
- 338:	30 f1       	brcs	.+76     	; 0x386 <__vector_18+0x90>
+ 368:	80 91 04 01 	lds	r24, 0x0104	; 0x800104 <counter_recive>
+ 36c:	83 30       	cpi	r24, 0x03	; 3
+ 36e:	40 f1       	brcs	.+80     	; 0x3c0 <__vector_18+0x94>
 	{
 		counter_recive = 0;
- 33a:	10 92 05 01 	sts	0x0105, r1	; 0x800105 <counter_recive>
+ 370:	10 92 04 01 	sts	0x0104, r1	; 0x800104 <counter_recive>
 		switch(data_recive[0]) //смотрим, что за команда пришла
- 33e:	80 91 0e 01 	lds	r24, 0x010E	; 0x80010e <data_recive>
- 342:	82 30       	cpi	r24, 0x02	; 2
- 344:	49 f0       	breq	.+18     	; 0x358 <__vector_18+0x62>
- 346:	86 30       	cpi	r24, 0x06	; 6
- 348:	71 f0       	breq	.+28     	; 0x366 <__vector_18+0x70>
- 34a:	81 30       	cpi	r24, 0x01	; 1
- 34c:	e1 f4       	brne	.+56     	; 0x386 <__vector_18+0x90>
+ 374:	80 91 0a 01 	lds	r24, 0x010A	; 0x80010a <data_recive>
+ 378:	82 30       	cpi	r24, 0x02	; 2
+ 37a:	49 f0       	breq	.+18     	; 0x38e <__vector_18+0x62>
+ 37c:	86 30       	cpi	r24, 0x06	; 6
+ 37e:	71 f0       	breq	.+28     	; 0x39c <__vector_18+0x70>
+ 380:	81 30       	cpi	r24, 0x01	; 1
+ 382:	f1 f4       	brne	.+60     	; 0x3c0 <__vector_18+0x94>
 		{
 			case 1:
 				mode = data_recive[2];
- 34e:	80 91 10 01 	lds	r24, 0x0110	; 0x800110 <data_recive+0x2>
- 352:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
+ 384:	80 91 0c 01 	lds	r24, 0x010C	; 0x80010c <data_recive+0x2>
+ 388:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
 				break;
- 356:	17 c0       	rjmp	.+46     	; 0x386 <__vector_18+0x90>
+ 38c:	19 c0       	rjmp	.+50     	; 0x3c0 <__vector_18+0x94>
 			case 2:
-				USART_Transmit(13, temperature_avaliable());
- 358:	0e 94 a9 00 	call	0x152	; 0x152 <temperature_avaliable>
- 35c:	bc 01       	movw	r22, r24
- 35e:	8d e0       	ldi	r24, 0x0D	; 13
- 360:	0e 94 99 00 	call	0x132	; 0x132 <USART_Transmit>
+				USART_Transmit(0xD, temperature_avaliable());
+ 38e:	0e 94 b5 00 	call	0x16a	; 0x16a <temperature_avaliable>
+ 392:	bc 01       	movw	r22, r24
+ 394:	8d e0       	ldi	r24, 0x0D	; 13
+ 396:	0e 94 a0 00 	call	0x140	; 0x140 <USART_Transmit>
 				break;
- 364:	10 c0       	rjmp	.+32     	; 0x386 <__vector_18+0x90>
+ 39a:	12 c0       	rjmp	.+36     	; 0x3c0 <__vector_18+0x94>
 			case 4:
 				break;
 			case 5:// компьютер принял пакет
 				break;
 			case 6:
 				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
- 366:	80 91 0f 01 	lds	r24, 0x010F	; 0x80010f <data_recive+0x1>
- 36a:	83 3c       	cpi	r24, 0xC3	; 195
- 36c:	61 f4       	brne	.+24     	; 0x386 <__vector_18+0x90>
- 36e:	80 91 10 01 	lds	r24, 0x0110	; 0x800110 <data_recive+0x2>
- 372:	8c 3c       	cpi	r24, 0xCC	; 204
- 374:	41 f4       	brne	.+16     	; 0x386 <__vector_18+0x90>
+ 39c:	80 91 0b 01 	lds	r24, 0x010B	; 0x80010b <data_recive+0x1>
+ 3a0:	83 3c       	cpi	r24, 0xC3	; 195
+ 3a2:	71 f4       	brne	.+28     	; 0x3c0 <__vector_18+0x94>
+ 3a4:	80 91 0c 01 	lds	r24, 0x010C	; 0x80010c <data_recive+0x2>
+ 3a8:	8c 3c       	cpi	r24, 0xCC	; 204
+ 3aa:	51 f4       	brne	.+20     	; 0x3c0 <__vector_18+0x94>
 				{
-					connect = 1;
- 376:	81 e0       	ldi	r24, 0x01	; 1
- 378:	80 93 03 01 	sts	0x0103, r24	; 0x800103 <connect>
+					flags_avaliable |= (1 << connect);
+ 3ac:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <flags_avaliable>
+ 3b0:	80 61       	ori	r24, 0x10	; 16
+ 3b2:	80 93 06 01 	sts	0x0106, r24	; 0x800106 <flags_avaliable>
 					USART_Transmit(0x10,0x3C33);
- 37c:	63 e3       	ldi	r22, 0x33	; 51
- 37e:	7c e3       	ldi	r23, 0x3C	; 60
- 380:	80 e1       	ldi	r24, 0x10	; 16
- 382:	0e 94 99 00 	call	0x132	; 0x132 <USART_Transmit>
+ 3b6:	63 e3       	ldi	r22, 0x33	; 51
+ 3b8:	7c e3       	ldi	r23, 0x3C	; 60
+ 3ba:	80 e1       	ldi	r24, 0x10	; 16
+ 3bc:	0e 94 a0 00 	call	0x140	; 0x140 <USART_Transmit>
 				}
 				break;
 		}
 	}
 }
- 386:	ff 91       	pop	r31
- 388:	ef 91       	pop	r30
- 38a:	bf 91       	pop	r27
- 38c:	af 91       	pop	r26
- 38e:	9f 91       	pop	r25
- 390:	8f 91       	pop	r24
- 392:	7f 91       	pop	r23
- 394:	6f 91       	pop	r22
- 396:	5f 91       	pop	r21
- 398:	4f 91       	pop	r20
- 39a:	3f 91       	pop	r19
- 39c:	2f 91       	pop	r18
- 39e:	0f 90       	pop	r0
- 3a0:	0f be       	out	0x3f, r0	; 63
- 3a2:	0f 90       	pop	r0
- 3a4:	1f 90       	pop	r1
- 3a6:	18 95       	reti
+ 3c0:	ff 91       	pop	r31
+ 3c2:	ef 91       	pop	r30
+ 3c4:	bf 91       	pop	r27
+ 3c6:	af 91       	pop	r26
+ 3c8:	9f 91       	pop	r25
+ 3ca:	8f 91       	pop	r24
+ 3cc:	7f 91       	pop	r23
+ 3ce:	6f 91       	pop	r22
+ 3d0:	5f 91       	pop	r21
+ 3d2:	4f 91       	pop	r20
+ 3d4:	3f 91       	pop	r19
+ 3d6:	2f 91       	pop	r18
+ 3d8:	0f 90       	pop	r0
+ 3da:	0f be       	out	0x3f, r0	; 63
+ 3dc:	0f 90       	pop	r0
+ 3de:	1f 90       	pop	r1
+ 3e0:	18 95       	reti
 
-000003a8 <main>:
+000003e2 <main>:
 
 int main(void)
 {
 	initialization();
- 3a8:	0e 94 48 00 	call	0x90	; 0x90 <initialization>
+ 3e2:	0e 94 48 00 	call	0x90	; 0x90 <initialization>
     while (1) 
     {
 		switch(mode)
- 3ac:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
- 3b0:	81 30       	cpi	r24, 0x01	; 1
- 3b2:	79 f0       	breq	.+30     	; 0x3d2 <main+0x2a>
- 3b4:	18 f0       	brcs	.+6      	; 0x3bc <main+0x14>
- 3b6:	83 30       	cpi	r24, 0x03	; 3
- 3b8:	d9 f0       	breq	.+54     	; 0x3f0 <main+0x48>
- 3ba:	f8 cf       	rjmp	.-16     	; 0x3ac <main+0x4>
+ 3e6:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
+ 3ea:	88 23       	and	r24, r24
+ 3ec:	19 f0       	breq	.+6      	; 0x3f4 <main+0x12>
+ 3ee:	83 30       	cpi	r24, 0x03	; 3
+ 3f0:	61 f0       	breq	.+24     	; 0x40a <__LOCK_REGION_LENGTH__+0xa>
+ 3f2:	f9 cf       	rjmp	.-14     	; 0x3e6 <main+0x4>
 		{
 			case 0: //режим простоя
 				PORTD |= (1 << Led_green);
- 3bc:	5e 9a       	sbi	0x0b, 6	; 11
+ 3f4:	5e 9a       	sbi	0x0b, 6	; 11
 				PORTD &= ~(1 << Led_red);
- 3be:	5d 98       	cbi	0x0b, 5	; 11
+ 3f6:	5d 98       	cbi	0x0b, 5	; 11
 				// отключаем инвертор
 				if (avaliable_spi == 0)
- 3c0:	80 91 0a 01 	lds	r24, 0x010A	; 0x80010a <avaliable_spi>
- 3c4:	81 11       	cpse	r24, r1
- 3c6:	f2 cf       	rjmp	.-28     	; 0x3ac <main+0x4>
 				{
 					spi_transmit_mcp(0b00010001,0);
- 3c8:	60 e0       	ldi	r22, 0x00	; 0
- 3ca:	81 e1       	ldi	r24, 0x11	; 17
- 3cc:	0e 94 85 00 	call	0x10a	; 0x10a <spi_transmit_mcp>
- 3d0:	ed cf       	rjmp	.-38     	; 0x3ac <main+0x4>
+ 3f8:	60 e0       	ldi	r22, 0x00	; 0
+ 3fa:	81 e1       	ldi	r24, 0x11	; 17
+ 3fc:	0e 94 85 00 	call	0x10a	; 0x10a <spi_transmit_mcp>
 				}
-				break;
-			case 1: //режим подготовки к измерению
-				if ((avaliable_usart == 0) && (connect == 1))
- 3d2:	80 91 09 01 	lds	r24, 0x0109	; 0x800109 <avaliable_usart>
- 3d6:	81 11       	cpse	r24, r1
- 3d8:	e9 cf       	rjmp	.-46     	; 0x3ac <main+0x4>
- 3da:	80 91 03 01 	lds	r24, 0x0103	; 0x800103 <connect>
- 3de:	81 30       	cpi	r24, 0x01	; 1
- 3e0:	29 f7       	brne	.-54     	; 0x3ac <main+0x4>
-				{
-					USART_Transmit(13, temperature_avaliable());
- 3e2:	0e 94 a9 00 	call	0x152	; 0x152 <temperature_avaliable>
- 3e6:	bc 01       	movw	r22, r24
- 3e8:	8d e0       	ldi	r24, 0x0D	; 13
- 3ea:	0e 94 99 00 	call	0x132	; 0x132 <USART_Transmit>
- 3ee:	de cf       	rjmp	.-68     	; 0x3ac <main+0x4>
+				while (mode == 0) {}
+ 400:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
+ 404:	88 23       	and	r24, r24
+ 406:	e1 f3       	breq	.-8      	; 0x400 <__LOCK_REGION_LENGTH__>
+ 408:	ee cf       	rjmp	.-36     	; 0x3e6 <main+0x4>
 				break;
 			case 2: //режим измерения
 				
 				break;
 			case 3:
 				PORTD &= ~(1 << Led_green);
- 3f0:	5e 98       	cbi	0x0b, 6	; 11
+ 40a:	5e 98       	cbi	0x0b, 6	; 11
 				spi_transmit_mcp(0b00010001,0);
- 3f2:	60 e0       	ldi	r22, 0x00	; 0
- 3f4:	81 e1       	ldi	r24, 0x11	; 17
- 3f6:	0e 94 85 00 	call	0x10a	; 0x10a <spi_transmit_mcp>
+ 40c:	60 e0       	ldi	r22, 0x00	; 0
+ 40e:	81 e1       	ldi	r24, 0x11	; 17
+ 410:	0e 94 85 00 	call	0x10a	; 0x10a <spi_transmit_mcp>
 				break;
- 3fa:	d8 cf       	rjmp	.-80     	; 0x3ac <main+0x4>
+ 414:	e8 cf       	rjmp	.-48     	; 0x3e6 <main+0x4>
 
-000003fc <_exit>:
- 3fc:	f8 94       	cli
+00000416 <_exit>:
+ 416:	f8 94       	cli
 
-000003fe <__stop_program>:
- 3fe:	ff cf       	rjmp	.-2      	; 0x3fe <__stop_program>
+00000418 <__stop_program>:
+ 418:	ff cf       	rjmp	.-2      	; 0x418 <__stop_program>
