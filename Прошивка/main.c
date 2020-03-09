@@ -131,7 +131,7 @@ ISR(SPI_STC_vect)
 ISR(TIMER0_OVF_vect)
 {
 	counter_update_max++;
-	if (counter_update_max == 10)
+	if (counter_update_max == 9)
 	{
 		counter_update_max = 0;
 		if (!(flags_avaliable & (1 << transmit_spi)))
@@ -228,9 +228,14 @@ ISR(USART_RX_vect)
 				break;
 			case 4:
 				break;
-			case 5:// компьютер принял пакет
+			case 5:
+				TCNT2 = 0;
+				spi_transmit_mcp(0b00010001, 255);
 				break;
 			case 6:
+				spi_transmit_mcp(0b00010001, 0);
+				break;
+			case 7:
 				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
 				{
 					flags_avaliable |= (1 << connect);
