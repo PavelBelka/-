@@ -20,8 +20,8 @@ volatile uint8_t data_max[4] = {0, 0, 0, 0};
 volatile uint8_t data_recive[3] = {0, 0, 0};
 volatile uint8_t data_transmit[3] = {0, 0, 0};
 volatile uint8_t flags_avaliable = 0;
-volatile uint8_t step_transmit = 0, counter_recive = 0, counter_usart = 0;
-volatile uint16_t counter_update_max = 0, usart_recive_data = 0;
+volatile uint8_t step_transmit = 0, counter_recive = 0, counter_usart = 0, counter_update_max = 0, counter_update_led = 0;
+volatile uint8_t led_state = 0; // режим мигания светодиодами
 volatile uint8_t mode = 0; // режим работы
 
 void initialization()
@@ -41,13 +41,16 @@ void initialization()
 	SPCR &= ~((1 << CPOL) | (1 << CPHA) | (1 << DORD));
 	// Настройка USART: асинхронный режим, 8 бит посылка, 1 стоп-бит, контроль четности отключен, скорость 9600 бод, прерывание по приему
 	UCSR0A |= (1 << U2X0); //включаем ускоритель
-	UBRR0 = 207;
+	UBRR0 = 103;
 	UCSR0B |= (1 << TXEN0) | (1 << RXEN0) | (1 << RXCIE0) | (1 << TXCIE0);
 	UCSR0C |= (1 << USBS0) | (1 << UCSZ01) | (1 << UCSZ00);
 	UCSR0C &= ~((1 << UMSEL00) | (1 << UMSEL01) | (1 << USBS0));
 	// Настройка таймера 0: предделитель на 1024, прерывание по переполнению включен
 	TCCR0B |= (1 << CS02) | (1 << CS00);
 	TIMSK0 |= (1 << TOIE0);
+	// Настройка таймера 2: предделитель на 1024, прерывание по переполнению включен
+	TCCR2B |= (1 << CS00) | (1 << CS01) | (1 << CS02);
+	TIMSK2 |= (1 << TOIE2);
 	sei();
 }
 
@@ -75,7 +78,6 @@ void USART_Transmit(uint8_t command, uint16_t data) // передача кома
 	data_transmit[1] = data >> 8;
 	data_transmit[2] = data & 0xFF;
 	flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
-	flags_avaliable |= (1 << transmit_usart);
 	counter_usart = 0;
 	UDR0 = data_transmit[0]; //записываем данные
 }
@@ -139,6 +141,52 @@ ISR(TIMER0_OVF_vect)
 	}
 }
 
+ISR(TIMER2_OVF_vect)
+{
+	counter_update_led++;
+	if (counter_update_led == 61)//режимы мигания светодиодов
+	{
+		counter_update_led = 0;
+		switch (led_state)
+		{
+			case 1:
+			if (PORTD & (1 << Led_green))
+			{
+				PORTD &= ~(1 << Led_green);
+				PORTD |= (1 << Led_red);
+			}
+			else
+			{
+				PORTD |= (1 << Led_green);
+				PORTD &= ~(1 << Led_red);
+			}
+			break;
+			case 2:
+			PORTD &= ~(1 << Led_red);
+			if (PORTD & (1 << Led_green))
+			{
+				PORTD &= ~(1 << Led_green);
+			}
+			else
+			{
+				PORTD |= (1 << Led_green);
+			}
+			break;
+			case 3:
+			PORTD &= ~(1 << Led_green);
+			if (PORTD & (1 << Led_red))
+			{
+				PORTD &= ~(1 << Led_red);
+			}
+			else
+			{
+				PORTD |= (1 << Led_red);
+			}
+			break;
+		}
+	}
+}
+
 ISR(USART_TX_vect)
 {
 	counter_usart++;
@@ -167,7 +215,14 @@ ISR(USART_RX_vect)
 				mode = data_recive[2];
 				break;
 			case 2:
-				USART_Transmit(0xD, temperature_avaliable());
+				if (mode == 3)
+				{
+					USART_Transmit(12, 0);
+				} 
+				else
+				{
+					USART_Transmit(0xD, temperature_avaliable());
+				}
 				break;
 			case 3:
 				break;
@@ -194,27 +249,31 @@ int main(void)
 		switch(mode)
 		{
 			case 0: //режим простоя
+				led_state = 0;
 				PORTD |= (1 << Led_green);
 				PORTD &= ~(1 << Led_red);
 				// отключаем инвертор
-				if (avaliable_spi == 0)
+				if (!(flags_avaliable & (1 << avaliable_spi)))
 				{
 					spi_transmit_mcp(0b00010001,0);
 				}
 				while (mode == 0) {}
 				break;
 			case 1: //режим подготовки к измерению
-				if ((avaliable_usart == 0) && (connect == 1))
-				{
-					USART_Transmit(0xD, temperature_avaliable());
-				}
+				led_state = 1;
+				while (mode == 1){}
 				break;
 			case 2: //режим измерения
-				
+				led_state = 2;
+				while (mode == 2){}
 				break;
 			case 3: //режим аварии
-				PORTD &= ~(1 << Led_green);
-				spi_transmit_mcp(0b00010001,0);
+				led_state = 3;
+				if (!(flags_avaliable & (1 << avaliable_spi)))
+				{
+					spi_transmit_mcp(0b00010001,0);
+				}
+				while(mode == 3){}
 				break;
 		}
     }
