@@ -39,7 +39,7 @@ void initialization()
 	// Настройка SPI: делитель на 128, режим master, прерывание включены
 	SPCR |= (1 << SPIE) | (1 << SPE) | (1 << MSTR) | (1 << SPR0) | (1 << SPR1);
 	SPCR &= ~((1 << CPOL) | (1 << CPHA) | (1 << DORD));
-	// Настройка USART: асинхронный режим, 8 бит посылка, 1 стоп-бит, контроль четности отключен, скорость 9600 бод, прерывание по приему
+	// Настройка USART: асинхронный режим, 8 бит посылка, 1 стоп-бит, контроль четности отключен, скорость 19200 бод, прерывание по приему
 	UCSR0A |= (1 << U2X0); //включаем ускоритель
 	UBRR0 = 103;
 	UCSR0B |= (1 << TXEN0) | (1 << RXEN0) | (1 << RXCIE0) | (1 << TXCIE0);
@@ -118,7 +118,7 @@ ISR(SPI_STC_vect)
 			if ((data_max[1] & 0b00000001) == 0b00000001)
 			{
 				mode = 3;
-				USART_Transmit(12,0);
+				USART_Transmit(0x5A,0);
 			}
 		}
 		else
@@ -211,35 +211,35 @@ ISR(USART_RX_vect)
 		counter_recive = 0;
 		switch(data_recive[0]) //смотрим, что за команда пришла
 		{
-			case 1:
+			case 65:
 				mode = data_recive[2];
 				break;
-			case 2:
+			case 66:
 				if (mode == 3)
 				{
-					USART_Transmit(12, 0);
+					USART_Transmit(0x5A, 0);
 				} 
 				else
 				{
-					USART_Transmit(0xD, temperature_avaliable());
+					USART_Transmit(0x5B, temperature_avaliable());
 				}
 				break;
-			case 3:
+			case 67:
 				break;
-			case 4:
+			case 68:
 				break;
-			case 5:
+			case 69:
 				TCNT2 = 0;
 				spi_transmit_mcp(0b00010001, 255);
 				break;
-			case 6:
+			case 70:
 				spi_transmit_mcp(0b00010001, 0);
 				break;
-			case 7:
+			case 71:
 				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
 				{
 					flags_avaliable |= (1 << connect);
-					USART_Transmit(0x10,0x3C33);
+					USART_Transmit(0x56,0x3C33);
 				}
 				break;
 		}
@@ -260,7 +260,7 @@ int main(void)
 				// отключаем инвертор
 				if (!(flags_avaliable & (1 << avaliable_spi)))
 				{
-					spi_transmit_mcp(0b00010001,0);
+					//spi_transmit_mcp(0b00010001,0);
 				}
 				while (mode == 0) {}
 				break;
