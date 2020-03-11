@@ -30,27 +30,27 @@ void initialization()
 	DDRB |= (1 << PORTB1) | (1 << SPI_sck) | (1 << SPI_mosi);
 	DDRB &= ~((1 << PORTB0) | (1 << SPI_miso));
 	// Настройка порта D: PD7, PD0 - вход, PD6, PD5, PD1 - выход
-	DDRD |= (1 << PORTD6) | (1 << PORTD5) | (1 << PORTD1);
-	DDRD &= ~((1 << PORTD7) | (1 << PORTD0));
+	DDRD |= (1 << PORTD6) | (1 << PORTD5);
+	DDRD &= ~(1 << PORTD7);
 	// Настройка порта C: PC0 - выход, PC1 - выход
 	DDRC |= (1 << CS_max31855) | (1 << CS_mcp41010);
 	PORTB &= ~((1 << SPI_sck) | (1 << SPI_mosi));
 	PORTC |= (1 << CS_mcp41010) | (1 << CS_max31855);
 	// Настройка SPI: делитель на 128, режим master, прерывание включены
-	SPCR |= (1 << SPIE) | (1 << SPE) | (1 << MSTR) | (1 << SPR0) | (1 << SPR1);
-	SPCR &= ~((1 << CPOL) | (1 << CPHA) | (1 << DORD));
+	//SPCR |= (1 << SPIE) | (1 << SPE) | (1 << MSTR) | (1 << SPR0) | (1 << SPR1);
+	//SPCR &= ~((1 << CPOL) | (1 << CPHA) | (1 << DORD));
 	// Настройка USART: асинхронный режим, 8 бит посылка, 1 стоп-бит, контроль четности отключен, скорость 19200 бод, прерывание по приему
 	UCSR0A |= (1 << U2X0); //включаем ускоритель
 	UBRR0 = 103;
-	UCSR0B |= (1 << TXEN0) | (1 << RXEN0) | (1 << RXCIE0) | (1 << TXCIE0);
+	UCSR0B |= (1 << TXEN0) | (1 << RXEN0) | (1 << TXCIE0) | (1 << RXCIE0);
 	UCSR0C |= (1 << USBS0) | (1 << UCSZ01) | (1 << UCSZ00);
 	UCSR0C &= ~((1 << UMSEL00) | (1 << UMSEL01) | (1 << USBS0));
 	// Настройка таймера 0: предделитель на 1024, прерывание по переполнению включен
-	TCCR0B |= (1 << CS02) | (1 << CS00);
-	TIMSK0 |= (1 << TOIE0);
+	//TCCR0B |= (1 << CS02) | (1 << CS00);
+	//TIMSK0 |= (1 << TOIE0);
 	// Настройка таймера 2: предделитель на 1024, прерывание по переполнению включен
-	TCCR2B |= (1 << CS00) | (1 << CS01) | (1 << CS02);
-	TIMSK2 |= (1 << TOIE2);
+	//TCCR2B |= (1 << CS00) | (1 << CS01) | (1 << CS02);
+	//TIMSK2 |= (1 << TOIE2);
 	sei();
 }
 
@@ -66,15 +66,16 @@ void spi_transmit_mcp(uint8_t command, uint8_t data)//отправка по spi 
 
 void spi_reception_max31855()
 {
-	flags_avaliable |= (1 << avaliable_spi);
-	PORTC &= ~(1 << CS_max31855);
-	SPDR = 0xFF;
+	//flags_avaliable |= (1 << avaliable_spi);
+	//PORTC &= ~(1 << CS_max31855);
+	//SPDR = 0xFF;
 }
 
 void USART_Transmit(uint8_t command, uint16_t data) // передача команды и данных по uart
 {
 	//делим на пакеты
 	data_transmit[0] = command;
+	//data_transmit[1] = data;
 	data_transmit[1] = data >> 8;
 	data_transmit[2] = data & 0xFF;
 	flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
@@ -90,7 +91,7 @@ volatile uint16_t temperature_avaliable()
 
 ISR(SPI_STC_vect)
 {
-	if (flags_avaliable & (1 << transmit_spi)) //проверяем отправляем ли мы данные
+	/*if (flags_avaliable & (1 << transmit_spi)) //проверяем отправляем ли мы данные
 	{
 		switch(step_transmit)
 		{
@@ -118,14 +119,14 @@ ISR(SPI_STC_vect)
 			if ((data_max[1] & 0b00000001) == 0b00000001)
 			{
 				mode = 3;
-				USART_Transmit(0x5A,0);
+				USART_Transmit(86,0);
 			}
 		}
 		else
 		{
 			SPDR = 0xFF;
 		}
-	}
+	}*/
 }
 
 ISR(TIMER0_OVF_vect)
@@ -217,11 +218,11 @@ ISR(USART_RX_vect)
 			case 66:
 				if (mode == 3)
 				{
-					USART_Transmit(0x5A, 0);
+					USART_Transmit(86, 0);
 				} 
 				else
 				{
-					USART_Transmit(0x5B, temperature_avaliable());
+					USART_Transmit(87, temperature_avaliable());
 				}
 				break;
 			case 67:
@@ -239,12 +240,13 @@ ISR(USART_RX_vect)
 				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
 				{
 					flags_avaliable |= (1 << connect);
-					USART_Transmit(0x56,0x3C33);
+					USART_Transmit(91,0x3C33);
 				}
 				break;
 		}
 	}
 }
+
 
 int main(void)
 {
@@ -262,7 +264,9 @@ int main(void)
 				{
 					//spi_transmit_mcp(0b00010001,0);
 				}
-				while (mode == 0) {}
+				USART_Transmit('s', 0x6D6E);
+				while (mode == 0) 
+				{}
 				break;
 			case 1: //режим подготовки к измерению
 				led_state = 1;
