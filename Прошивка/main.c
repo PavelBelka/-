@@ -40,11 +40,9 @@ void initialization()
 	//SPCR |= (1 << SPIE) | (1 << SPE) | (1 << MSTR) | (1 << SPR0) | (1 << SPR1);
 	//SPCR &= ~((1 << CPOL) | (1 << CPHA) | (1 << DORD));
 	// Настройка USART: асинхронный режим, 8 бит посылка, 1 стоп-бит, контроль четности отключен, скорость 19200 бод, прерывание по приему
-	UCSR0A |= (1 << U2X0); //включаем ускоритель
-	UBRR0 = 103;
+	UBRR0 = 25;
 	UCSR0B |= (1 << TXEN0) | (1 << RXEN0) | (1 << TXCIE0) | (1 << RXCIE0);
-	UCSR0C |= (1 << USBS0) | (1 << UCSZ01) | (1 << UCSZ00);
-	UCSR0C &= ~((1 << UMSEL00) | (1 << UMSEL01) | (1 << USBS0));
+	UCSR0C |= (0 << USBS0) | (1 << UCSZ01) | (1 << UCSZ00);
 	// Настройка таймера 0: предделитель на 1024, прерывание по переполнению включен
 	//TCCR0B |= (1 << CS02) | (1 << CS00);
 	//TIMSK0 |= (1 << TOIE0);
@@ -66,19 +64,19 @@ void spi_transmit_mcp(uint8_t command, uint8_t data)//отправка по spi 
 
 void spi_reception_max31855()
 {
-	//flags_avaliable |= (1 << avaliable_spi);
-	//PORTC &= ~(1 << CS_max31855);
-	//SPDR = 0xFF;
+	flags_avaliable |= (1 << avaliable_spi);
+	PORTC &= ~(1 << CS_max31855);
+	SPDR = 0xFF;
 }
 
-void USART_Transmit(uint8_t command, uint16_t data) // передача команды и данных по uart
+void USART_Transmit(uint8_t command, uint8_t data_high, uint8_t data_low) // передача команды и данных по uart
 {
 	//делим на пакеты
 	data_transmit[0] = command;
 	//data_transmit[1] = data;
-	data_transmit[1] = data >> 8;
-	data_transmit[2] = data & 0xFF;
-	flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
+	data_transmit[1] = data_high;
+	data_transmit[2] = data_low;
+	//flags_avaliable |= (1 << avaliable_usart); // говорим что занят uart
 	counter_usart = 0;
 	UDR0 = data_transmit[0]; //записываем данные
 }
@@ -193,9 +191,11 @@ ISR(USART_TX_vect)
 	counter_usart++;
 	if (counter_usart > 2)//последняя посылка
 	{
-		counter_usart = 0;
-		flags_avaliable &= ~(1 << avaliable_usart);
+		//flags_avaliable &= ~(1 << avaliable_usart);
 		flags_avaliable &= ~(1 << transmit_usart);
+		data_recive[0] = 0;
+		data_recive[1] = 0;
+		data_recive[2] = 0;
 	}
 	else
 	{
@@ -210,7 +210,8 @@ ISR(USART_RX_vect)
 	if (counter_recive > 2) // если приняли все пакеты
 	{
 		counter_recive = 0;
-		switch(data_recive[0]) //смотрим, что за команда пришла
+		flags_avaliable |= (1 << avaliable_usart);
+		/*switch(data_recive[0]) //смотрим, что за команда пришла
 		{
 			case 65:
 				mode = data_recive[2];
@@ -237,13 +238,16 @@ ISR(USART_RX_vect)
 				spi_transmit_mcp(0b00010001, 0);
 				break;
 			case 71:
-				if ((data_recive[1] == 195) && (data_recive[2] == 204)) // запрос от "своей" программы
+				if ((data_recive[1] == 89) && (data_recive[2] == 66)) // запрос от "своей" программы
 				{
 					flags_avaliable |= (1 << connect);
-					USART_Transmit(91,0x3C33);
+					USART_Transmit('A',0x5645);
 				}
 				break;
-		}
+			default:
+				USART_Transmit('E', 0x7272);
+				break;
+		}*/
 	}
 }
 
@@ -253,7 +257,12 @@ int main(void)
 	initialization();
     while (1) 
     {
-		switch(mode)
+		if (flags_avaliable & (1 << avaliable_usart))
+		{
+			flags_avaliable &= ~(1 << avaliable_usart);
+			USART_Transmit(data_recive[0], data_recive[1], data_recive[2]);
+		}
+		/*switch(mode)
 		{
 			case 0: //режим простоя
 				led_state = 0;
@@ -264,13 +273,9 @@ int main(void)
 				{
 					//spi_transmit_mcp(0b00010001,0);
 				}
-				USART_Transmit('s', 0x6D6E);
-				while (mode == 0) 
-				{}
 				break;
 			case 1: //режим подготовки к измерению
 				led_state = 1;
-				while (mode == 1){}
 				break;
 			case 2: //режим измерения
 				led_state = 2;
@@ -282,8 +287,15 @@ int main(void)
 				{
 					spi_transmit_mcp(0b00010001,0);
 				}
-				while(mode == 3){}
 				break;
 		}
+		while (1)
+		{
+			//if (flags_avaliable && (1 << avaliable_usart))
+			//{
+			//	flags_avaliable &= ~(1 << avaliable_usart);
+			//	USART_Transmit(data_recive[0], data_recive[1], data_recive[2]);
+			//}
+		}*/
     }
 }
